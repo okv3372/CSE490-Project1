@@ -1,0 +1,43 @@
+flowchart LR
+    PC["PC"] -->|"byte address"| IM["Instruction memory"]
+    PC --> P2["PC + 2"]
+
+    IM -->|"opcode [15:12], function [3:0]"| CU["Control unit"]
+    IM -->|"rs [7:4], rt/rd [11:8]"| RF["Register file<br/>16 registers × 16 bits"]
+    IM -->|"immediate [3:0]"| SE4["Sign extend 4 to 16 bits"]
+    IM -->|"jump address [11:0]"| SE12["Sign extend 12 to 16 bits"]
+
+    RF -->|"R[rs]"| ALU["ALU<br/>ADD, SUB, SLL, AND"]
+    RF -->|"R[rt/rd]"| ASRC["ALU input mux"]
+    SE4 --> ASRC
+    ASRC --> ALU
+
+    RF -->|"R[rs]"| EQ["Equal?"]
+    RF -->|"R[rt/rd]"| EQ
+    EQ -->|"equal result"| CU
+
+    ALU -->|"memory address"| DM["Data memory"]
+    RF -->|"R[rt/rd]: store data"| DM
+    ALU -->|"ALU result"| WB["Writeback mux"]
+    DM -->|"load data"| WB
+    WB -->|"write R[rt/rd]"| RF
+
+    SE4 --> BS["Shift left 1"]
+    BS --> BA["Branch target adder"]
+    P2 --> BA
+
+    SE12 --> JS["Shift left 1"]
+    JS --> JA["Jump target adder"]
+    P2 --> JA
+
+    P2 --> NPC["Next PC mux"]
+    BA --> NPC
+    JA --> NPC
+    NPC --> PC
+
+    CU -. "ALU source" .-> ASRC
+    CU -. "ALU operation" .-> ALU
+    CU -. "register write" .-> RF
+    CU -. "memory read/write" .-> DM
+    CU -. "writeback select" .-> WB
+    CU -. "next PC select" .-> NPC

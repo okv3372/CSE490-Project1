@@ -1,0 +1,6 @@
+.DS_Store
+.Xil/
+*.jou
+*.str
+*.wdb
+*.vcd
