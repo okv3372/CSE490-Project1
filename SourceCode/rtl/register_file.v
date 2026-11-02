@@ -5,6 +5,8 @@ module register_file (
     input wire clk,
     // when high on rising edge, clear regs
     input wire reset,
+    // one button press allows one write
+    input wire enable,
 
     //four bit addresses selecting the registers for rs and rt
     input wire [3:0] rs_addr,
@@ -17,7 +19,10 @@ module register_file (
 
     // current val stored in regs
     output wire [15:0] rs_data,
-    output wire [15:0] rt_data
+    output wire [15:0] rt_data,
+    // extra port so the tests can read a register without changing rs or rt
+    input wire [3:0] debug_addr,
+    output wire [15:0] debug_data
 );
     // array w the 16 regs, each 16 bits wide, 16 of them
     reg [15:0] registers [0:15];
@@ -26,15 +31,16 @@ module register_file (
 
     assign rs_data = registers[rs_addr];
     assign rt_data = registers[rt_addr];
+    assign debug_data = registers[debug_addr];
 
-    //the writing happens here, if reset is high clear the regs, otherwise if write_enable is high write the data to the register in write_addr
+    //the writing happens here, if reset is high clear the regs, otherwise enable and write_enable both need to be high
     always @(posedge clk) begin
         //reset has priority over writing
         if (reset) begin
             for (i = 0; i < 16; i = i + 1) begin
                 registers[i] <= 16'h0000;
             end
-        end else if (write_enable) begin
+        end else if (enable && write_enable) begin
             registers[write_addr] <= write_data;
         end
     end

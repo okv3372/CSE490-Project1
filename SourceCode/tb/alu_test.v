@@ -69,10 +69,9 @@ module alu_tb;
         // AND: keep bits that are 1 in both operands
         check(4'b0011, 16'hF0F0, 16'h0FF0, 16'h00F0);
 
-        if (errors == 0)
-            $display("ALL ALU TESTS PASSED");
-        else
-            $display("ALU TESTS FAILED: %0d errors", errors);
+        if (errors != 0)
+            $fatal(1, "ALU TESTS FAILED: %0d errors", errors);
+        $display("ALL ALU TESTS PASSED");
 
         $finish;
     end

@@ -21,6 +21,7 @@ module register_file_tb;
     register_file dut (
         .clk(clk),
         .reset(reset),
+        .enable(1'b1),
         .rs_addr(rs_addr),
         .rt_addr(rt_addr),
         .write_enable(write_enable),
@@ -125,10 +126,9 @@ module register_file_tb;
             check_reads(i, i, 16'h0000, 16'h0000);
         end
 
-        if (errors == 0)
-            $display("ALL REGISTER FILE TESTS PASSED");
-        else
-            $display("REGISTER FILE TESTS FAILED: %0d errors", errors);
+        if (errors != 0)
+            $fatal(1, "REGISTER FILE TESTS FAILED: %0d errors", errors);
+        $display("ALL REGISTER FILE TESTS PASSED");
 
         $finish;
     end
